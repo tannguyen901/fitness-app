@@ -1,19 +1,19 @@
-const Exercise = require("../models/Exercise");
+const Exercise = require('../models/Exercise');
 
-const getAllExercises = async (req, res) => {
-  // Implement getting all exercises for a specific user.
+exports.getExercises = async (req, res) => {
+  try {
+    const exercises = await Exercise.find();
+    res.status(200).json(exercises);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
 };
 
-const addExercise = async (req, res) => {
-  // Implement adding an exercise for a specific user.
-};
-
-const deleteExercise = async (req, res) => {
-  // Implement deleting an exercise by ID.
-};
-
-module.exports = {
-  getAllExercises,
-  addExercise,
-  deleteExercise,
+exports.updateExercises = async (req, res) => {
+  try {
+    await Exercise.updateOne({}, { data: req.body.exercises }, { upsert: true });
+    res.json({ message: 'Exercises updated successfully' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 };

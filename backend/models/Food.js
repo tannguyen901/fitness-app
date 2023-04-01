@@ -1,21 +1,14 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
-const foodSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-  },
-  calories: {
-    type: Number,
-    required: true,
-  },
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
-  },
+const FoodSchema = new mongoose.Schema({
+  data: [
+    {
+      food: String,
+      calories: Number,
+    },
+  ],
+  totalCalories: Number,
+  goalCalories: Number,
 });
 
-const Food = mongoose.model("Food", foodSchema);
-
-module.exports = Food;
+module.exports = mongoose.model('Food', FoodSchema);
