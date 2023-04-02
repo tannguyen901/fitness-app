@@ -15,7 +15,7 @@ const RunningTracker = () => {
       const response = await api.get("/runs")
       const data = response.data;
       console.log('Data received from server:', data);
-      setRuns(data.runs || []);
+      setRuns(data.data || []);
       setKmRan(data.kmRan || 0);
       setGoalKm(data.goalKm || 0);
     }

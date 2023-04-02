@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 
 const ExerciseSchema = new mongoose.Schema({
-  data: {
     Push: [
       {
         name: String,
@@ -23,7 +22,6 @@ const ExerciseSchema = new mongoose.Schema({
         reps: Number,
       },
     ],
-  },
 });
 
 module.exports = mongoose.model('Exercise', ExerciseSchema);
