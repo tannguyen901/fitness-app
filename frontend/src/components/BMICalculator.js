@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import PageWrapper from './PageWrapper';
-import axios from 'axios';
+import api from '../api';
 
 const BMICalculator = () => {
   const [age, setAge] = useState('');
@@ -13,14 +13,17 @@ const BMICalculator = () => {
   }, []);
 
   const fetchData = async () => {
-    const response = await axios.get("/api/bmi");
+    const response = await api.get("/bmi");
     const data = response.data;
-    setBmiData(data.bmiData);
+    if (data.bmiData) {
+      setBmiData(data.bmiData);
+    }
   };
 
-  const updateBackend = async () => {
-    await axios.put("/api/bmi", { bmiData });
+  const updateBackend = async (newData) => {
+    await api.put("/bmi", { bmiData: newData });
   };
+  
 
   const calculateHealth = (bmi) => {
     if (bmi < 18.5) {
@@ -39,8 +42,9 @@ const BMICalculator = () => {
     const heightInMeters = height / 100;
     const bmi = weight / (heightInMeters * heightInMeters);
     const health = calculateHealth(bmi);
-    setBmiData({ bmi, health });
-    await updateBackend();
+    const newBmiData = { bmi, health };
+    setBmiData(newBmiData);
+    await updateBackend(newBmiData);
   };
 
   return (

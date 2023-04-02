@@ -23,7 +23,7 @@ const FitnessTip = () => {
       <p>
         {quote}
       </p>
-      <button>Click to get a new quote</button>
+      <button onClick={fetchQuote}>Click to get a new quote</button>
     </PageWrapper>
   );
 };

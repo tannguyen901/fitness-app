@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import PageWrapper from './PageWrapper';
 import api from '../api';
-import axios from 'axios';
 
 const RunningTracker = () => {
   const [distance, setDistance] = useState('');
@@ -13,11 +12,12 @@ const RunningTracker = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await axios.get("/api/runs")
+      const response = await api.get("/runs")
       const data = response.data;
-      setRuns(data.runs);
-      setKmRan(data.kmRan);
-      setGoalKm(data.goalKm);
+      console.log('Data received from server:', data);
+      setRuns(data.runs || []);
+      setKmRan(data.kmRan || 0);
+      setGoalKm(data.goalKm || 0);
     }
     fetchData();
   }, []);
@@ -30,10 +30,17 @@ const RunningTracker = () => {
     const newRun = { date: dateString, distance: parseFloat(distance) };
     const updatedRuns = [...runs, newRun];
     setRuns(updatedRuns);
-    setWeeklyDistance(weeklyDistance + parseFloat(distance));
+    const updatedWeeklyDistance = weeklyDistance + parseFloat(distance);
+    setWeeklyDistance(updatedWeeklyDistance);
     setDistance('');
-
-    await api.post('/running', { runs: updatedRuns, weeklyGoal, weeklyDistance });
+  
+    await api.post('/runs', {
+      data: updatedRuns,
+      weeklyGoal,
+      weeklyDistance: updatedWeeklyDistance,
+      kmRan,
+      goalKm,
+    });
   };
 
   const remainingKilometers = weeklyGoal - weeklyDistance;
