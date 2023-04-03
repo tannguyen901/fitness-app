@@ -7,7 +7,7 @@ const ExerciseTracker = () => {
   const [exerciseName, setExerciseName] = useState("");
   const [sets, setSets] = useState("");
   const [reps, setReps] = useState("");
-  const [exercises, setExercises] = useState({ Push: [], Pull: [], Legs: [] });
+  const [exercises, setExercises] = useState({ _id: "", Push: [], Pull: [], Legs: [] });
   const [selectedExercise, setSelectedExercise] = useState(null);
   const [isEditMode, setIsEditMode] = useState(false);
 
@@ -30,8 +30,11 @@ const ExerciseTracker = () => {
       (exercise, index) => index !== exerciseId
     );
     setExercises(updatedExercises);
-
-    await updateBackend();
+  
+    // Await for exercises state to be updated before calling updateBackend
+    setTimeout(async () => {
+      await updateBackend();
+    }, 0);
   };
 
   const fetchData = async () => {
@@ -40,6 +43,7 @@ const ExerciseTracker = () => {
       const data = response.data;
       if (data && data.length > 0) {
         const exercisesData = {
+          _id: data[0]._id,
           Push: data[0].Push || [],
           Pull: data[0].Pull || [],
           Legs: data[0].Legs || [],
@@ -51,33 +55,38 @@ const ExerciseTracker = () => {
     }
   };
   
-  
-
-  const updateBackend = async () => {
-    const id = exercises._id;
+  const updateBackend = async (newExercises) => {
+    const id = newExercises._id;
     if (id) {
       await api.put(`/exercises/${id}`, {
-        exercises,
+        exercises: {
+          Push: newExercises.Push,
+          Pull: newExercises.Pull,
+          Legs: newExercises.Legs,
+        },
       });
     } else {
-      const response = await api.post('/exercises', {
-        exercises,
+      const response = await api.post("/exercises", {
+        exercises: {
+          Push: newExercises.Push,
+          Pull: newExercises.Pull,
+          Legs: newExercises.Legs,
+        },
       });
-      setExercises(response.data);
+      setExercises({ ...response.data, _id: response.data._id });
     }
   };
   
-
-
+  
   const handleAddExercise = async (e) => {
     e.preventDefault();
-
+  
     const exercise = {
       name: exerciseName,
-      sets: parseInt(sets),
       reps: parseInt(reps),
+      sets: parseInt(sets),
     };
-
+  
     let newExercises;
     if (isEditMode) {
       const updatedCategoryExercises = exercises[category].map((ex) =>
@@ -91,14 +100,19 @@ const ExerciseTracker = () => {
         [category]: [...exercises[category], exercise],
       };
     }
-
+    console.log(newExercises);
+    console.log(exercises);
     setExercises(newExercises);
     setExerciseName("");
     setSets("");
     setReps("");
-
-    await updateBackend();
+  
+    // Pass newExercises to updateBackend
+    await updateBackend(newExercises);
   };
+  
+  
+  
 
   return (
     <PageWrapper>

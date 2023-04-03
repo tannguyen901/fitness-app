@@ -13,7 +13,17 @@ exports.createExercise = async (req, res) => {
   const { exercises } = req.body;
 
   try {
-    const newExercises = new Exercise({ Push: [], Pull: [], Legs: [] });
+    const existingExerciseData = await Exercise.findOne();
+
+    if (existingExerciseData) {
+      return res.status(409).json({ message: 'Exercise data already exists' });
+    }
+
+    const newExercises = new Exercise({
+      Push: exercises.Push || [],
+      Pull: exercises.Pull || [],
+      Legs: exercises.Legs || [],
+    });
 
     await newExercises.save();
 
@@ -30,7 +40,7 @@ exports.updateExercises = async (req, res) => {
 
   try {
     // Find the exercise document by _id and update it
-    const updatedExercises = await Exercise.findByIdAndUpdate(id, { exercises }, { new: true });
+    const updatedExercises = await Exercise.findByIdAndUpdate(id, { $set: { ...exercises } }, { new: true });
 
     if (!updatedExercises) {
       return res.status(404).send({ message: 'Exercise not found' });
@@ -41,4 +51,3 @@ exports.updateExercises = async (req, res) => {
     res.status(500).send({ message: 'Error updating exercises' });
   }
 };
-
