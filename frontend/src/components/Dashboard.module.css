@@ -1,0 +1,32 @@
+/* Dashboard.module.css */
+
+.dashboardContainer {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-gap: 1rem;
+    margin-top: 1rem;
+  }
+  
+  .section {
+    background-color: white;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .section h4 {
+    margin-bottom: 1rem;
+  }
+  
+  .section ul {
+    list-style: none;
+    padding-left: 0;
+  }
+  
+  @media (max-width: 767px) {
+    .section {
+      flex: 1 1 100%;
+      max-width: 100%;
+    }
+  }
+  
