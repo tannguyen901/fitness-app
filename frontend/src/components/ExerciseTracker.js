@@ -35,19 +35,39 @@ const ExerciseTracker = () => {
   };
 
   const fetchData = async () => {
-    const response = await api.get("/exercises");
-    const data = response.data;
-    if (data.length > 0) {
-      const exercisesData = data[0].data;
-      setExercises(exercisesData);
+    try {
+      const response = await api.get("/exercises");
+      const data = response.data;
+      if (data && data.length > 0) {
+        const exercisesData = {
+          Push: data[0].Push || [],
+          Pull: data[0].Pull || [],
+          Legs: data[0].Legs || [],
+        };
+        setExercises(exercisesData);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
     }
   };
+  
+  
 
   const updateBackend = async () => {
-    await api.put(`/exercises`, {
-      exercises,
-    });
+    const id = exercises._id;
+    if (id) {
+      await api.put(`/exercises/${id}`, {
+        exercises,
+      });
+    } else {
+      const response = await api.post('/exercises', {
+        exercises,
+      });
+      setExercises(response.data);
+    }
   };
+  
+
 
   const handleAddExercise = async (e) => {
     e.preventDefault();
@@ -137,7 +157,6 @@ const ExerciseTracker = () => {
         />
         <button type="submit">Add Exercise</button>
       </form>
-
       <h3>Exercises:</h3>
       {["Push", "Pull", "Legs"].map((cat) => (
         <div key={cat}>

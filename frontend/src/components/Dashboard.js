@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import FitnessTip from "./FitnessTip";
 import PageWrapper from "./PageWrapper";
 import api from "../api";
+import styles from "./Dashboard.module.css";
+import BMIChart from "./BMIChart";
 
 const Dashboard = () => {
   const [caloriesLeft, setCaloriesLeft] = useState(0);
@@ -24,7 +26,7 @@ const Dashboard = () => {
     kmRan: 0,
     goalKm: 0,
   });
-  
+
   const { Push, Pull, Legs } = exerciseData;
 
   useEffect(() => {
@@ -44,11 +46,11 @@ const Dashboard = () => {
           ]);
 
         setBMIData(bmiResponse.data || { bmiData: { bmi: 0, health: "" } });
-        setExerciseData(exerciseResponse.data[0].data || { Push: [], Pull: [], Legs: [] });
+        setExerciseData(exerciseResponse.data[0] || { Push: [], Pull: [], Legs: [] });
         setFoodData(foodResponse.data);
         setRunningData(runningResponse.data);
         setLoading(false);
-        console.log(runningData);
+        console.log(exerciseResponse.data[0]);
       } catch (error) {
         console.error(error);
       }
@@ -63,72 +65,93 @@ const Dashboard = () => {
 
   const calorieProgress =
     (foodData.totalCalories / foodData.goalCalories) * 100;
-  const kmsRanProgress = (runningData.weeklyGoal / runningData.weeklyDistance) * 100;
+  const kmsRanProgress =
+    (runningData.weeklyGoal / runningData.weeklyDistance) * 100;
 
   if (loading) {
     return <p>Loading...</p>;
   }
   return (
     <PageWrapper>
+    <div className={styles.section}>
       <h2>Welcome, User!</h2>
-
-      <h3>Progress Summary</h3>
-      <p>
-        Calories consumed: {foodData.totalCalories} / {foodData.goalCalories}
-      </p>
-      <progress value={calorieProgress} max="100"></progress>
-      <p>
-        Kilometers ran: {runningData.weeklyGoal} / {runningData.weeklyDistance} km
-      </p>
-      <progress value={kmsRanProgress} max="100"></progress>
-
-      <h3>Recent Activities</h3>
-      <h4>Push</h4>
-      <ul>
-        {Push &&
-          Push.map((body_exercise, index) => (
-            <li key={index}>
-              {body_exercise.name}: {body_exercise.sets} sets of {body_exercise.reps} reps
-            </li>
-          ))}
-      </ul>
-      <h4>Pull</h4>
-      <ul>
-        {Pull &&
-          Pull.map((body_exercise, index) => (
-            <li key={index}>
-              {body_exercise.name}: {body_exercise.sets} sets of {body_exercise.reps} reps
-            </li>
-          ))}
-      </ul>
-      <h4>Legs</h4>
-      <ul>
-        {Legs &&
-          Legs.map((body_exercise, index) => (
-            <li key={index}>
-              {body_exercise.name}: {body_exercise.sets} sets of {body_exercise.reps} reps
-            </li>
-          ))}
-      </ul>
-      
-
-      <h3>Today's Food Intake</h3>
-      <ul>
-        {foodData &&
-          foodData.data.map((item, index) => (
-            <li key={index}>
-              {item.food}: {item.calories} calories
-            </li>
-          ))}
-      </ul>
-      <p>Calories left today: {caloriesLeft}</p>
-
-      <h3>Current BMI and Health Condition</h3>
-      <p>BMI: {bmiData.bmiData.bmi.toFixed(2)}</p>
-      <p>Health: {bmiData.bmiData.health}</p>
-
-      <h3>Fitness Tip of the Day</h3>
-      <FitnessTip />
+        <h3>Fitness Tip of the Day</h3>
+        <FitnessTip />
+      </div>
+      <div className={styles.dashboardContainer}>
+        <div className={styles.section}>
+          <h3>Progress Summary</h3>
+          <p>
+            Calories consumed: {foodData.totalCalories} /{" "}
+            {foodData.goalCalories}
+          </p>
+          <progress value={calorieProgress} max="100"></progress>
+          <p>
+          <h3>
+          Calories Left to Goal:{" "}
+          {foodData.goalCalories - foodData.totalCalories} cal
+        </h3>
+            Kilometers ran: {runningData.weeklyGoal} /{" "}
+            {runningData.weeklyDistance} km
+          </p>
+          <progress value={kmsRanProgress} max="100"></progress>
+          <h3>
+            Kilometers Left to Goal:{" "}
+            {runningData.weeklyDistance - runningData.weeklyGoal} km
+          </h3>
+        </div>
+        <div className={styles.section}>
+          <h3>Recent Activities</h3>
+          <h4>Push</h4>
+          <ul>
+            {Push &&
+              Push.map((body_exercise, index) => (
+                <li key={index}>
+                  {body_exercise.name}: {body_exercise.sets} sets of{" "}
+                  {body_exercise.reps} reps
+                </li>
+              ))}
+          </ul>
+          <h4>Pull</h4>
+          <ul>
+            {Pull &&
+              Pull.map((body_exercise, index) => (
+                <li key={index}>
+                  {body_exercise.name}: {body_exercise.sets} sets of{" "}
+                  {body_exercise.reps} reps
+                </li>
+              ))}
+          </ul>
+          <h4>Legs</h4>
+          <ul>
+            {Legs &&
+              Legs.map((body_exercise, index) => (
+                <li key={index}>
+                  {body_exercise.name}: {body_exercise.sets} sets of{" "}
+                  {body_exercise.reps} reps
+                </li>
+              ))}
+          </ul>
+        </div>
+        <div className={styles.section}>
+          <h3>Today's Food Intake</h3>
+          <ul>
+            {foodData &&
+              foodData.data.map((item, index) => (
+                <li key={index}>
+                  {item.food}: {item.calories} calories
+                </li>
+              ))}
+          </ul>
+          <p>Calories left today: {caloriesLeft}</p>
+        </div>
+        <div className={styles.section}>
+          <h3>Current BMI and Health Condition</h3>
+          <p>BMI: {bmiData.bmiData.bmi.toFixed(2)}</p>
+          <p>Health: {bmiData.bmiData.health}</p>
+          <BMIChart bmi={bmiData.bmiData.bmi} />
+        </div>
+      </div>
     </PageWrapper>
   );
 };
