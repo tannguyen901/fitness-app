@@ -9,11 +9,36 @@ exports.getExercises = async (req, res) => {
   }
 };
 
-exports.updateExercises = async (req, res) => {
+exports.createExercise = async (req, res) => {
+  const { exercises } = req.body;
+
   try {
-    await Exercise.updateOne({}, { data: req.body.exercises }, { upsert: true });
-    res.json({ message: 'Exercises updated successfully' });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+    const newExercises = new Exercise({ Push: [], Pull: [], Legs: [] });
+
+    await newExercises.save();
+
+    res.status(201).json(newExercises);
+  } catch (error) {
+    res.status(400).json({ message: 'Error creating exercise data' });
   }
 };
+
+
+exports.updateExercises = async (req, res) => {
+  const id = req.params.id; // Get the _id from the request parameters
+  const { exercises } = req.body;
+
+  try {
+    // Find the exercise document by _id and update it
+    const updatedExercises = await Exercise.findByIdAndUpdate(id, { exercises }, { new: true });
+
+    if (!updatedExercises) {
+      return res.status(404).send({ message: 'Exercise not found' });
+    }
+
+    res.status(200).send(updatedExercises);
+  } catch (error) {
+    res.status(500).send({ message: 'Error updating exercises' });
+  }
+};
+

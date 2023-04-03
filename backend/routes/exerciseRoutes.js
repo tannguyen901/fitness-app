@@ -6,6 +6,8 @@ const exerciseController = require('../controllers/exerciseController');
 router.get('/', exerciseController.getExercises);
 
 // Update an existing exercise entry
-router.put('/', exerciseController.updateExercises);
+router.put('/:id', exerciseController.updateExercises);
+
+router.post('/', exerciseController.createExercise);
 
 module.exports = router;
