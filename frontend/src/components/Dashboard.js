@@ -46,7 +46,9 @@ const Dashboard = () => {
           ]);
 
         setBMIData(bmiResponse.data || { bmiData: { bmi: 0, health: "" } });
-        setExerciseData(exerciseResponse.data[0] || { Push: [], Pull: [], Legs: [] });
+        setExerciseData(
+          exerciseResponse.data[0] || { Push: [], Pull: [], Legs: [] }
+        );
         setFoodData(foodResponse.data);
         setRunningData(runningResponse.data);
         setLoading(false);
@@ -66,15 +68,15 @@ const Dashboard = () => {
   const calorieProgress =
     (foodData.totalCalories / foodData.goalCalories) * 100;
   const kmsRanProgress =
-    (runningData.weeklyGoal / runningData.weeklyDistance) * 100;
+    (runningData.weeklyDistance / runningData.weeklyGoal) * 100;
 
   if (loading) {
     return <p>Loading...</p>;
   }
   return (
     <PageWrapper>
-    <div className={styles.section}>
-      <h2>Welcome, User!</h2>
+      <div className={styles.section}>
+        <h2>Welcome, User!</h2>
         <h3>Fitness Tip of the Day</h3>
         <FitnessTip />
       </div>
@@ -87,18 +89,30 @@ const Dashboard = () => {
           </p>
           <progress value={calorieProgress} max="100"></progress>
           <p>
-          <h3>
-          Calories Left to Goal:{" "}
-          {foodData.goalCalories - foodData.totalCalories} cal
-        </h3>
-            Kilometers ran: {runningData.weeklyGoal} /{" "}
-            {runningData.weeklyDistance} km
+            Kilometers ran: {runningData.weeklyDistance} /
+            {runningData.weeklyGoal}km
           </p>
           <progress value={kmsRanProgress} max="100"></progress>
           <h3>
-            Kilometers Left to Goal:{" "}
-            {runningData.weeklyDistance - runningData.weeklyGoal} km
+            Calories Left to Goal:{" "}
+            {foodData.goalCalories - foodData.totalCalories} cal
           </h3>
+          <h3>
+            Kilometers Left to Goal:{" "}
+            {runningData.weeklyGoal - runningData.weeklyDistance} km
+          </h3>
+        </div>
+        <div className={styles.section}>
+          <h3>Today's Food Intake</h3>
+          <ul>
+            {foodData &&
+              foodData.data.map((item, index) => (
+                <li key={index}>
+                  {item.food}: {item.calories} calories
+                </li>
+              ))}
+          </ul>
+          <p>Calories left today: {caloriesLeft}</p>
         </div>
         <div className={styles.section}>
           <h3>Recent Activities</h3>
@@ -132,18 +146,6 @@ const Dashboard = () => {
                 </li>
               ))}
           </ul>
-        </div>
-        <div className={styles.section}>
-          <h3>Today's Food Intake</h3>
-          <ul>
-            {foodData &&
-              foodData.data.map((item, index) => (
-                <li key={index}>
-                  {item.food}: {item.calories} calories
-                </li>
-              ))}
-          </ul>
-          <p>Calories left today: {caloriesLeft}</p>
         </div>
         <div className={styles.section}>
           <h3>Current BMI and Health Condition</h3>

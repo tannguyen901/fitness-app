@@ -18,6 +18,9 @@ const RunningTracker = () => {
       setRuns(data.data || []);
       setKmRan(data.kmRan || 0);
       setGoalKm(data.goalKm || 0);
+      setWeeklyGoal(data.weeklyGoal ||0);
+      setWeeklyDistance(data.weeklyDistance || 0);
+      
     }
     fetchData();
   }, []);
@@ -43,6 +46,26 @@ const RunningTracker = () => {
     });
   };
 
+  const removeRun = async (index) => {
+    const newRuns = [...runs];
+    const removedDistance = newRuns[index].distance;
+    setKmRan(kmRan + removedDistance);
+    newRuns.splice(index, 1);
+    setRuns(newRuns);
+  
+    const updatedWeeklyDistance = weeklyDistance - removedDistance;
+    setWeeklyDistance(updatedWeeklyDistance);
+  
+    await api.post('/runs', {
+      data: newRuns,
+      weeklyGoal,
+      weeklyDistance: updatedWeeklyDistance,
+      kmRan,
+      goalKm,
+    });
+  };
+  
+
   const remainingKilometers = weeklyGoal - weeklyDistance;
   const progressBarPercentage = Math.min(100, (weeklyDistance / weeklyGoal) * 100);
   
@@ -65,7 +88,7 @@ const RunningTracker = () => {
       <h3>Runs:</h3>
       <ul>
         {runs.map((run, index) => (
-          <li key={index}>
+          <li key={index} onClick={() => removeRun(index)}>
             {run.date} - {run.distance} km
           </li>
         ))}

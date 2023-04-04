@@ -7,11 +7,16 @@ const ExerciseTracker = () => {
   const [exerciseName, setExerciseName] = useState("");
   const [sets, setSets] = useState("");
   const [reps, setReps] = useState("");
-  const [exercises, setExercises] = useState({ _id: "", Push: [], Pull: [], Legs: [] });
+  const [exercises, setExercises] = useState({
+    _id: "",
+    Push: [],
+    Pull: [],
+    Legs: [],
+  });
   const [selectedExercise, setSelectedExercise] = useState(null);
   const [isEditMode, setIsEditMode] = useState(false);
 
-  const handleEditExercise = (exercise) => {
+  const handleEditExercise = (exercise, category) => {
     setSelectedExercise(exercise);
     setCategory(category);
     setExerciseName(exercise.name);
@@ -30,11 +35,9 @@ const ExerciseTracker = () => {
       (exercise, index) => index !== exerciseId
     );
     setExercises(updatedExercises);
-  
+
     // Await for exercises state to be updated before calling updateBackend
-    setTimeout(async () => {
-      await updateBackend();
-    }, 0);
+    await updateBackend(updatedExercises);
   };
 
   const fetchData = async () => {
@@ -54,7 +57,7 @@ const ExerciseTracker = () => {
       console.error("Error fetching data:", error);
     }
   };
-  
+
   const updateBackend = async (newExercises) => {
     const id = newExercises._id;
     if (id) {
@@ -76,17 +79,16 @@ const ExerciseTracker = () => {
       setExercises({ ...response.data, _id: response.data._id });
     }
   };
-  
-  
+
   const handleAddExercise = async (e) => {
     e.preventDefault();
-  
+
     const exercise = {
       name: exerciseName,
       reps: parseInt(reps),
       sets: parseInt(sets),
     };
-  
+
     let newExercises;
     if (isEditMode) {
       const updatedCategoryExercises = exercises[category].map((ex) =>
@@ -100,23 +102,18 @@ const ExerciseTracker = () => {
         [category]: [...exercises[category], exercise],
       };
     }
-    console.log(newExercises);
-    console.log(exercises);
     setExercises(newExercises);
     setExerciseName("");
     setSets("");
     setReps("");
-  
+
     // Pass newExercises to updateBackend
     await updateBackend(newExercises);
   };
-  
-  
-  
 
   return (
     <PageWrapper>
-      <h2>Exercise Tracker</h2>
+      <h2></h2>
       <form onSubmit={handleAddExercise}>
         <div>
           <label htmlFor="category">Category:</label>
@@ -180,7 +177,7 @@ const ExerciseTracker = () => {
               <li key={index}>
                 {exercise.name} - {exercise.sets} sets of {exercise.reps} reps
                 <button
-                  onClick={() => handleEditExercise(exercise)}
+                  onClick={() => handleEditExercise(exercise, cat)}
                   style={{
                     fontSize: "0.5em",
                     padding: "4px 8px",
